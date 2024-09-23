@@ -1,0 +1,50 @@
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: "http://servicio-oauth:9100"
+      client:
+        registration:
+          client-app:  #nombre del servidor de autenticacionpc xeonpc
+            provider: spring  #provedor
+            client-id: client-app #nombre del client_id
+            client-secret: 12345 #client secret o contraseña
+            authorization-grant-type: authorization_code # solicitando el codigo de autorizacion
+            redirect-uri: "http://gateway-server:8091/authorized" #controlador que ira la ruta o endpoint
+            scope: 
+             - openid
+             - profile
+             - read
+             - write
+            client-name: client-app
+        provider:
+          spring:
+           issuer-uri: "http://servicio-oauth:9100"
+  cloud:
+    gateway:
+      routes:
+      - id: servicio-productos
+        uri: lb://servicio-productos
+        predicates:
+          - Path=/api/productos/**
+        filters:
+          - StripPrefix=2
+        #  - EjemploCookie=Hola mi mensaje personalizado, usuario, AndresGuzman
+      - id: servicio-items
+        uri: lb://servicio-items
+        predicates:
+          - Path=/api/items/**
+        filters:
+          - StripPrefix=2
+        #  - AddRequestHeader=token-request, 123456
+        #  - AddResponseHeader=token-response, 12345678
+        #  - SetResponseHeader=Content-Type, text/plain
+        #  - AddRequestParameter=nombre, andres
+      - id: servicio-usuarios
+        uri: lb://servicio-usuarios
+        predicates:
+          - Path=/api/usuarios/**
+        filters:
+          - StripPrefix=2
+  
